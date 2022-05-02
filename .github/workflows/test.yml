@@ -1,0 +1,38 @@
+name: Merge Request - Testing
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  check:
+    name: mr-validation
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.15.0
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.json') }}
+
+      - name: Install Yarn
+        run: npm install --global yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run build
+        run: yarn build
+
+      - name: Run test
+        run: yarn test
